@@ -29,3 +29,13 @@ Thumbs.db
 
 # Optional local files
 *.local
+
+
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+.vercel/
+.DS_Store
