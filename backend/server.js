@@ -1,10 +1,14 @@
+
 const dns = require("dns");
 
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
+if (!process.env.VERCEL) {
+  dns.setServers(["8.8.8.8", "8.8.4.4"]);
+}
 
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+
 const connectDB = require("./config/db");
 
 const app = express();
@@ -13,8 +17,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB before processing requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
@@ -35,26 +46,27 @@ app.use("/api/notifications", notificationRoutes);
 
 // Basic route
 app.get("/", (req, res) => {
-  res.json({ message: "Campus Skill Exchange API is running" });
+  res.json({
+    message: "Campus Skill Exchange API is running"
+  });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: err.message });
+  console.error(err.message);
+  res.status(500).json({
+    error: "Internal server error"
+  });
 });
 
-const PORT = process.env.PORT || 5000;
+// Local development server
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
-server.on("error", (error) => {
-  if (error.code === "EADDRINUSE") {
-    console.error(`Port ${PORT} is already in use. Stop the existing server or set a different PORT.`);
-  } else {
-    console.error("Server error:", error);
-  }
-  process.exit(1);
-});
+// Export Express application for Vercel
+module.exports = app;
