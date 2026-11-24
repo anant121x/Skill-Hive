@@ -1,67 +1,17 @@
-# Campus Skill Exchange Platform
+# SkillHive - Campus Skill Exchange
 
-Campus Skill Exchange is a full-stack MERN web application where students can list skills, discover peer instructors, request learning sessions, schedule accepted sessions, track progress, mark sessions as completed, and give reviews and ratings.
-
-The platform is designed to make peer-to-peer learning inside a campus more organized and accessible.
-
----
-
-## Problem Statement
-
-In colleges, many students have useful skills, but there is no structured system to find who can teach a particular skill. Students usually depend on WhatsApp groups or personal contacts, which makes skill discovery and session management difficult.
-
-Campus Skill Exchange solves this by providing a centralized platform where students can offer skills, request sessions, schedule learning, track progress, and review instructors.
+SkillHive is a MERN web application for campus peer learning. Students can offer skills, find instructors, request and schedule sessions, track learning progress, and review completed sessions.
 
 ---
 
 ## Features
 
-### Authentication
-
-* User registration and login
-* JWT-based authentication
-* Password hashing
-* Protected routes
-* Auth state management using frontend context
-
-### Skill Management
-
-* Add a skill
-* View all listed skills
-* Edit and delete own skills
-* Skill category, description, and learning mode
-* Instructor information on each skill
-
-### Request and Session Management
-
-* Send request to learn a skill
-* Accept or reject received requests
-* Schedule accepted sessions
-* Mark session as In Progress
-* Mark session as Completed
-* Track sent and received requests from dashboard
-
-### Reviews and Ratings
-
-* Learner can review instructor after session completion
-* Rating system for instructors
-* Skill-specific instructor rating
-* Instructor details page with:
-
-  * Instructor name
-  * Listed skills
-  * Reviews
-  * Overall rating
-  * Skill-specific rating
-
-### Additional Features
-
-* User dashboard
-* Profile page
-* Notifications structure
-* Analytics backend structure
-* MongoDB Atlas database connection
-* Clean frontend-backend API integration using Axios
+* Register and log in with JWT-based authentication.
+* Create, edit, and delete your own skill listings.
+* Search and filter listings by title, category, and learning mode; sort and paginate results.
+* Request sessions, accept or reject requests, schedule sessions, and track progress and notes.
+* Review completed sessions and view mentor- and skill-specific reviews.
+* Manage profiles and notifications, view trending and recommended skills, and access usage statistics.
 
 ---
 
@@ -90,28 +40,14 @@ Campus Skill Exchange solves this by providing a centralized platform where stud
 * cors
 * nodemon
 
-### Database
-
-* MongoDB Atlas
-
 ---
 
 ## Project Workflow
 
 ```txt
-Request Sent
-↓
-Pending
-↓
-Accepted / Rejected
-↓
-Scheduled
-↓
-In Progress
-↓
-Completed
-↓
-Review and Rating
+Request: Pending -> Accepted or Rejected -> Scheduled -> Completed
+Learning progress: Not Started -> In Progress -> Completed
+After completion: Review
 ```
 
 ---
@@ -119,7 +55,7 @@ Review and Rating
 ## Folder Structure
 
 ```txt
-campus-skill-exchange/
+Skill-Hive/
 │
 ├── backend/
 │   ├── api/
@@ -150,6 +86,7 @@ campus-skill-exchange/
 │   │   └── main.jsx
 │   │
 │   ├── index.html
+│   ├── .gitignore
 │   ├── package.json
 │   ├── package-lock.json
 │   └── vite.config.js
@@ -162,11 +99,13 @@ campus-skill-exchange/
 
 ## Installation and Setup
 
+You need Node.js, npm, and access to a MongoDB database.
+
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/aabhinav1909-hash/SkillHive.git
-cd SkillHive
+git clone https://github.com/anant121x/Skill-Hive.git
+cd Skill-Hive
 ```
 
 ---
@@ -185,21 +124,18 @@ Install dependencies:
 npm install
 ```
 
-Create a `.env` file inside the `backend` folder.
+Create `backend/.env` from the example file:
 
-You can refer to:
-
-```txt
-backend/.env.example
+```powershell
+Copy-Item .env.example .env
 ```
 
-Add the following variables:
+Set `MONGO_URI` to your MongoDB connection string and `JWT_SECRET` to a secure secret. `PORT` is optional and defaults to `5000`.
 
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string_here
 JWT_SECRET=your_jwt_secret_here
-NODE_ENV=development
 ```
 
 Start backend server:
@@ -244,75 +180,23 @@ http://localhost:5173
 
 ---
 
-## Frontend and Backend Connection
-
-The frontend connects to the backend using Axios.
-
-File:
-
-```txt
-frontend/src/api/api.js
-```
-
-Example:
-
-```js
-import axios from "axios";
-
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
-});
-
-API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return req;
-});
-
-export default API;
-```
-
-For deployment, set `VITE_API_URL` to the deployed backend URL, including `/api`.
-For example:
-
-```env
-VITE_API_URL=https://your-backend.example.com/api
-```
-
----
-
 ## Environment Variables
 
-The real `.env` file is not pushed to GitHub for security reasons.
+The backend reads these variables from `backend/.env`:
 
-Required backend variables:
+* `MONGO_URI` — MongoDB connection string (required).
+* `JWT_SECRET` — secret used to sign and verify JWTs (required).
+* `PORT` — local server port (optional; defaults to `5000`).
 
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string_here
-JWT_SECRET=your_jwt_secret_here
-NODE_ENV=development
-```
-
-GitHub should include:
-
-```txt
-backend/.env.example
-```
-
-GitHub should not include:
-
-```txt
-backend/.env
-```
+For a deployed frontend, set `VITE_API_URL` to the backend API base URL, including `/api`. If it is unset, the frontend uses `http://localhost:5000/api`.
+The real `.env` file is ignored by Git; commit `backend/.env.example`, never `backend/.env`.
+The backend also includes a Vercel entry point and rewrite configuration; set `MONGO_URI` and `JWT_SECRET` in the deployment environment.
 
 ---
 
 ## API Routes
+
+All routes are prefixed with `/api`. Routes marked **auth** require a JWT bearer token.
 
 ### Auth Routes
 
@@ -325,27 +209,28 @@ POST /api/auth/login
 
 ```txt
 GET    /api/skills
-POST   /api/skills
+GET    /api/skills/my-skills           auth
+POST   /api/skills                     auth
 GET    /api/skills/:id
-PUT    /api/skills/:id
-DELETE /api/skills/:id
+PUT    /api/skills/:id                 auth
+DELETE /api/skills/:id                 auth
 ```
 
 ### Request and Session Routes
 
 ```txt
-POST /api/requests
-GET  /api/requests/sent
-GET  /api/requests/received
-PUT  /api/requests/:id/status
-PUT  /api/requests/:id/schedule
-PUT  /api/requests/:id/progress
+POST /api/requests                     auth
+GET  /api/requests/sent                auth
+GET  /api/requests/received             auth
+PUT  /api/requests/:id/status           auth
+PUT  /api/requests/:id/schedule         auth
+PUT  /api/requests/:id/progress         auth
 ```
 
 ### Review Routes
 
 ```txt
-POST /api/reviews
+POST /api/reviews                      auth
 GET  /api/reviews/mentor/:mentorId
 GET  /api/reviews/skill/:skillId
 ```
@@ -353,122 +238,27 @@ GET  /api/reviews/skill/:skillId
 ### Notification Routes
 
 ```txt
-GET /api/notifications
-PUT /api/notifications/:id/read
+GET /api/notifications                 auth
+PUT /api/notifications/:id/read        auth
 ```
 
 ### Analytics Routes
 
 ```txt
 GET /api/analytics/trending
-GET /api/analytics/recommended
-GET /api/analytics/admin/stats
+GET /api/analytics/recommended         auth
+GET /api/analytics/admin/stats         auth
 ```
 
 ### User Routes
 
 ```txt
-GET /api/users/profile
-PUT /api/users/profile
+GET /api/users/profile                 auth
+PUT /api/users/profile                 auth
 GET /api/users/:id
 ```
 
----
-
-## Database Collections
-
-MongoDB stores data in collections such as:
-
-```txt
-users
-skills
-sessionrequests
-reviews
-notifications
-```
-
-Main database:
-
-```txt
-campusSkillExchange
-```
-
----
-
-## Screenshots
-
-Add screenshots after uploading images to the repository.
-
-```md
-## Home Page
-![Home Page](./screenshots/home.png)
-
-## Skills Page
-![Skills Page](./screenshots/skills.png)
-
-## Dashboard
-![Dashboard](./screenshots/dashboard.png)
-
-## Instructor Profile
-![Instructor Profile](./screenshots/instructor.png)
-```
-
----
-
-## Current Status
-
-Completed:
-
-* Frontend UI
-* Backend APIs
-* MongoDB Atlas connection
-* User registration and login
-* JWT authentication
-* Protected routes
-* Skill listing and management
-* Request accept/reject workflow
-* Session scheduling
-* Session progress tracking
-* Session completion
-* Review and rating system
-* Instructor profile/details page
-* Dashboard
-* Notifications backend structure
-* Analytics backend structure
-
----
-
-## Future Improvements
-
-* Admin dashboard
-* Trending skills section
-* Skill recommendation system
-* Search, filter, sorting, and pagination
-* Real-time notifications
-* Email notifications
-* Deployment on Vercel and Render
-* Profile image upload
-* Calendar integration for scheduled sessions
-* Certificate or badge system after completed sessions
-
----
-
-## Resume Description
-
-Campus Skill Exchange Platform is a full-stack MERN peer-learning platform where students can list skills, discover peer instructors, request learning sessions, schedule accepted sessions, track session progress, mark sessions as completed, and give reviews and ratings. The project includes JWT authentication, MongoDB database design, REST APIs, protected routes, instructor profiles, and frontend-backend integration using Axios.
-
----
-
-## Resume Points
-
-* Built a full-stack MERN peer-learning platform where students can list skills, request learning sessions, schedule accepted sessions, and track session progress.
-* Implemented JWT authentication, password hashing, protected routes, REST APIs, and MongoDB models for users, skills, session requests, reviews, and notifications.
-* Designed a complete request-to-session workflow including request acceptance, session scheduling, progress tracking, completion marking, and post-session review/rating.
-* Developed instructor profile functionality showing instructor details, listed skills, reviews, overall rating, and skill-specific rating.
-
----
-
-## Author
+## Maintainer and Attribution
 
 Maintained by Abhinav Anand ([aabhinav1909-hash](https://github.com/aabhinav1909-hash)).
 
