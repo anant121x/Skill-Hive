@@ -122,15 +122,18 @@ Review and Rating
 campus-skill-exchange/
 │
 ├── backend/
+│   ├── api/
 │   ├── config/
 │   ├── controllers/
 │   ├── middleware/
 │   ├── models/
 │   ├── routes/
+│   ├── .gitignore
 │   ├── .env.example
 │   ├── package.json
 │   ├── package-lock.json
-│   └── server.js
+│   ├── server.js
+│   └── vercel.json
 │
 ├── frontend/
 │   ├── public/
@@ -162,11 +165,9 @@ campus-skill-exchange/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/mdyahiyaariz/campus-skill-exchange.git
-cd campus-skill-exchange
+git clone https://github.com/aabhinav1909-hash/SkillHive.git
+cd SkillHive
 ```
-
-Replace `YOUR_USERNAME` with your GitHub username.
 
 ---
 
@@ -259,7 +260,7 @@ Example:
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
 });
 
 API.interceptors.request.use((req) => {
@@ -275,7 +276,12 @@ API.interceptors.request.use((req) => {
 export default API;
 ```
 
-For deployment, replace the local backend URL with your deployed backend URL.
+For deployment, set `VITE_API_URL` to the deployed backend URL, including `/api`.
+For example:
+
+```env
+VITE_API_URL=https://your-backend.example.com/api
+```
 
 ---
 
@@ -334,15 +340,13 @@ GET  /api/requests/received
 PUT  /api/requests/:id/status
 PUT  /api/requests/:id/schedule
 PUT  /api/requests/:id/progress
-PUT  /api/requests/:id/complete
 ```
 
 ### Review Routes
 
 ```txt
 POST /api/reviews
-GET  /api/reviews
-GET  /api/reviews/instructor/:instructorId
+GET  /api/reviews/mentor/:mentorId
 GET  /api/reviews/skill/:skillId
 ```
 
@@ -356,10 +360,18 @@ PUT /api/notifications/:id/read
 ### Analytics Routes
 
 ```txt
-GET /api/analytics
+GET /api/analytics/trending
+GET /api/analytics/recommended
+GET /api/analytics/admin/stats
 ```
 
-Route names may vary slightly depending on the final backend implementation.
+### User Routes
+
+```txt
+GET /api/users/profile
+PUT /api/users/profile
+GET /api/users/:id
+```
 
 ---
 
@@ -458,7 +470,9 @@ Campus Skill Exchange Platform is a full-stack MERN peer-learning platform where
 
 ## Author
 
-Developed by Md Yahiya Ariz.
+Maintained by [aabhinav1909-hash](https://github.com/aabhinav1909-hash).
+
+Original project author: Md Yahiya Ariz.
 
 ---
 
