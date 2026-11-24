@@ -470,12 +470,8 @@ Campus Skill Exchange Platform is a full-stack MERN peer-learning platform where
 
 ## Author
 
-Maintained by [aabhinav1909-hash](https://github.com/aabhinav1909-hash).
+Maintained by Abhinav Anand ([aabhinav1909-hash](https://github.com/aabhinav1909-hash)).
 
-Original project author: Md Yahiya Ariz.
+Original project author: Abhinav Anand.
 
 ---
-
-## License
-
-This project is created for learning, portfolio, and academic purposes.
